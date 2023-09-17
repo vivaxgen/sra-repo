@@ -7,10 +7,10 @@ from sra_repo.utils import cerr, cout, cexit
 
 def site_args(p):
 
-    p.add_argument('--site', default='ena',
+    p.add_argument('--site', default='ena-entrez',
                    choices=['ena', 'entrez', 'ena-entrez', 'entrez-ena'],
                    help='set the site databaset repository to choose between EBI/ENA and '
-                        'NCBI/Entrez [ena]')
+                        'NCBI/Entrez [ena-entrez]')
 
 
 def input_args(p):
@@ -359,7 +359,10 @@ def iter_samplefile(samplefile):
     else:
         sample_column, ena_column = 'SAMPLE', 'ENA'
 
-    df = pd.read_table(samplefile, sep='\t')
+    if samplefile.endswith('.xls') or samplefile.endswith('.xlsx'):
+        df = pd.read_excel(samplefile)
+    else:
+        df = pd.read_table(samplefile, sep=None, engine='python')
 
     for idx, row in df.iterrows():
 
