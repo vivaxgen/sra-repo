@@ -235,6 +235,8 @@ def do_link(args, fs):
             outfile_df = pd.DataFrame({'SAMPLE': samples, 'FASTQ': fastq_paths})
             outfile_df.to_csv(args.outfile, index=False, sep='\t')
 
+        cerr(f'INFO: linked {len(fastq_files)} paired FASTQ files for {len(samples)} sample(s) ')
+
     else:
         sraids = []
         if args.idfile:
@@ -243,12 +245,16 @@ def do_link(args, fs):
         sraids += args.SRAIDs
 
         read_files = []
+        counter = 0
         for sra_id in sraids:
             try:
                 read_files += fs.link(sra_id, outdir, dryrun=args.check)
+                counter += 1
             except ValueError as err:
                 cerr(f'WARN: SRA ID {sra_id} is not in the database. '
                      f'Please run ena-repo fetch first.')
+
+        cerr(f'INFO: linked {len(read_files)} from {counter} SRA id(s)')
 
 
 def do_list(args, fs):
