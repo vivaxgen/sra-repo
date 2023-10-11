@@ -389,7 +389,12 @@ def iter_samplefile(samplefile):
 
 
 def iter_srafile(samplefile):
-    """ return a list of [[SRAID, ...], ...] """
+    """ return a list of [[SRAID, ...], ...] from a tabulated file (columnar data
+        with header) in either tab-delimited (.tsv), comma-delimited (.csv) or
+        Excel (.xls or .xlsx) format
+        samplefile should be in the file_path:column_name format, eg:
+        my_directory/my_file.tsv:SRAID
+    """
 
     import pandas as pd
 
@@ -418,7 +423,7 @@ def get_sraids(args):
 
     if args.idfile:
 
-        # id file should conotains SRA id per line without header
+        # id file should contain SRA id per line without header
 
         with open(args.idfile) as f:
             SRAIDs += [x.strip() for x in f.read().split()]
