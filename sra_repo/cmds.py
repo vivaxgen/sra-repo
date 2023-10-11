@@ -174,15 +174,16 @@ def do_check(args, fs):
     validator.validate(threads=args.ntasks)
 
     not_finished = len(sraids) - validator.finished
-    if any(errors := validator.err_sraids) or not_finished > 0:
+    errors = validator.err_sraids
+    if any(errors) or not_finished > 0:
         cerr(f'Unfinished validation: {not_finished}')
         cerr(f'Errors found in {len(errors)} SRA:')
         cerr('\n'.join(errors))
+    if args.validate:
+        cerr(f'{validator.finished - len(errors)} SRA ID(s) have been validated successfully.')
     else:
-        if args.validate:
-            cerr('All fastq files have been validated successfully.')
-        else:
-            cerr('All fastq files are in repository (but no validation checks were performed)')
+        cerr(f'{validator.finished - len(errors)} SRA ID(s) are in repository '
+             f'(but no validation checks were performed)')
 
 
 def do_link(args, fs):
@@ -286,12 +287,19 @@ def do_info(args, fs):
 
     SRAIDs = get_sraids(args)
 
-    info_lists = []
+    info_list = []
+    err_list = []
     for sra_id in SRAIDs:
-        info_lists.append(fs.get_validation_info(sra_id))
+        try:
+            info_list.append(fs.get_validation_info(sra_id))
+        except FileNotFoundError:
+            err_list.append(f'{sra_id} not found in database')
 
     import pprint
-    pprint.pprint(info_lists)
+    pprint.pprint(info_list)
+    if any(err_list):
+        cerr('Error messages:')
+        pprint.pprint(err_list)
 
 
 def do_fetch(args, fs):
