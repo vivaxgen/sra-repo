@@ -111,6 +111,18 @@ separated by comma for paired files, and semi-colon for different SRA for the sa
 Installation
 ------------
 
+The first step is to decide the main root directory where sra-repo and its repository system
+will be stored. For example, with main root directory of ``/shared/SRA``, the following
+directory structure would be recommended::
+
+    /shared/SRA
+    /shared/SRA/bin [for activate.sh script]
+    /shared/SRA/opt [for manual installation of the requirements if without Conda ]
+    /shared/SRA/opt/env [for sra-repo installation]
+    /shared/SRA/store [for the main repository of all FASTQ files]
+    /shared/SRA/tmp [for temporary space during downloads and format convertion]
+    /shared/SRA/cache [for samtools-fastq caching system converting CRAM to FASTQ]
+
 sra-repo is written in Python (the development is with Python 3.11) with the following additional modules used:
 
 * pycurl
@@ -130,10 +142,13 @@ from https://python.org. To install the above modules, once Python3 has been ins
 
 sra-repo also requires several external software to be installed:
 
-* NCBI SRA-Toolkit (can be obtained from https://github.com/ncbi/sra-tools)
+* NCBI SRA-Toolkit (can use Conda or be obtained from https://github.com/ncbi/sra-tools)
 
 * bcftools (can use Conda or download/install manually from https://htslib.org)
 
 * GNU parallel (comes in almost all Linux distributions)
+
+If all requirements are going to be manually installed (ie. not using Conda), all requirements
+can be installed in $MAIN_ROOT/opt where MAIN_ROOT is the main root directory of sra-repo repository (eg. /shared/SRA with the above example).
 
 [to be continued]
