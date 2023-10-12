@@ -71,7 +71,7 @@ def init_argparse():
     cmd_link.add_argument('--hard', default=False, action='store_true',
                           help='create hardlink instead of symlink(s) to outdir')
     cmd_link.add_argument('-o', '--outfile',
-                          help='output file conotaining sample manifest and their '
+                          help='output file containing sample manifest and their '
                           'associated fastq read files')
     cmd_link.add_argument('--outdir',  required=True,
                           help='output directory')
