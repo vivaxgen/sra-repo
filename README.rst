@@ -24,6 +24,14 @@ Some features:
 Examples
 --------
 
+sra-repo has bash tab-complete feature to make typing faster and typo-error free.
+Single-tapping TAB key will complete the argument automatically while double-tapping
+on TAB key will provide the available arguments. Do note that this feature only available
+under bash shell. Try::
+
+    $ sra-repo.py [TAB][TAB]
+    $ sra-repo.py fe[TAB]
+
 Several usage examples:
 
 Fetching FASTQ files
@@ -111,12 +119,14 @@ sra-repo is written in Python (the development is with Python 3.11) with the fol
 
 * rich
 
+* argcomplete
+
 
 Python can be installed either using Conda, or using the operating system software manager
 (eg. dnf for rpm-based Linux system or apt for deb-based Linux system), or download directly
 from https://python.org. To install the above modules, once Python3 has been installed, do the following::
 
-    $ pip3 install pycurl rich requests
+    $ pip3 install pycurl rich requests argcomplete
 
 sra-repo also requires several external software to be installed:
 
