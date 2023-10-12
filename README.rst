@@ -112,7 +112,9 @@ sra-repo is written in Python (the development is with Python 3.11) with the fol
 * rich
 
 
-To install the above modules, once Python3 has been installed, do the following::
+Python can be installed either using Conda, or using the operating system software manager
+(eg. dnf for rpm-based Linux system or apt for deb-based Linux system), or download directly
+from https://python.org. To install the above modules, once Python3 has been installed, do the following::
 
     $ pip3 install pycurl rich requests
 
