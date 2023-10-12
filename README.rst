@@ -64,7 +64,7 @@ To also validate the FASTQ files, use --validate argument::
 Finding information about FASTQ files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Other commands available in sra-repo are `info` and `path`, which will provide
+Other commands available in sra-repo are ``info`` and ``path``, which will provide
 information on the FASTQ files and the actual path where the FASTQ files were stored,
 respectively::
 
@@ -96,7 +96,7 @@ Please note that when using samplefile, the column names for Sample identifier a
 
 When using a sample file, sra-repo can provide a manifest file, a two-column tab-delimited file
 with SAMPLE and FASTQ header, providing the sample code and its associated FASTQ files
-separated by comma for paired files, and semi-colon for different SRA for the same sample.
+separated by comma for paired files, and semi-colon for different SRA for the same sample::
 
     $ sra-repo.py link --outdir test --o my-manifest.tsv --samplefile my_samplefile.tsv:Sample,ENA
 
