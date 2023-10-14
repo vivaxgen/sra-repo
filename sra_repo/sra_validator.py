@@ -165,7 +165,7 @@ class SRA_Validator(object):
 
     def revalidate_with_ENA(self, sra_id, read_files):
 
-        from ena_helper import ENA_Helper
+        from sra_repo.ena_helper import ENA_Helper
 
         info = ENA_Helper(None).get_sra_info(sra_id)
 
@@ -181,7 +181,7 @@ class SRA_Validator(object):
 
     def revalidate_with_Entrez(self, sra_id, read_files):
 
-        from entrez_helper import Entrez_Helper
+        from sra_repo.entrez_helper import Entrez_Helper
 
         info = Entrez_Helper(None).get_sra_info(sra_id)
 
