@@ -53,6 +53,8 @@ class ENA_Helper(object):
         """ return urls, paths, total_read_count, total_base_count """
         resp = get_ena_filereport(
             sra_id,
+            'study_accession,sample_accession,experiment_accession,run_accession,'
+            'tax_id,scientific_name,'
             'fastq_ftp,submitted_ftp,read_count,base_count,fastq_md5,fastq_bytes'
         )[0]
 
