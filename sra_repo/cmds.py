@@ -2,7 +2,7 @@
 import os
 import argparse
 
-from sra_repo.utils import cerr, cout, cexit
+from sra_repo.utils import cerr, cout, cexit, byte_conversion
 
 
 def site_args(p):
@@ -93,6 +93,11 @@ def init_argparse():
                            help='reverse the list of ACC IDs')
     cmd_fetch.add_argument('--showcmds', default=False, action='store_true',
                            help='show commands to run externally')
+    cmd_fetch.add_argument('--showurl', default=False, action='store_true',
+                           help='show URL during downloading')
+    cmd_fetch.add_argument('--targetdir', default=None,
+                           help='instead of storing to central repository, move the '
+                           'downloaded files to this target directory')
     site_args(cmd_fetch)
     input_args(cmd_fetch)
 
@@ -104,6 +109,13 @@ def init_argparse():
     cmd_list.add_argument('patterns', nargs='*',
                           help='pattern for SRA ids')
 
+    # command: inventory
+    cmd_inventory = cmds.add_parser('inventory',
+                                    help='view inventory information')
+    cmd_inventory.add_argument('--species', default=False, action='store_true',
+                               help='count number of each species')
+
+    # common arguments
     p.add_argument('--rootfs', default=None,
                    help='set root storage filesystem, default is using environment '
                         'SRA_REPO_STORE')
@@ -139,6 +151,9 @@ def do_command(args):
 
         case 'info':
             do_info(args, fs)
+
+        case 'inventory':
+            do_inventory(args, fs)
 
         case _:
             cexit('ERR: please provide command')
@@ -260,7 +275,9 @@ def do_link(args, fs):
 
 def do_list(args, fs):
 
-    pass
+    sra_list = fs.list()
+
+    cout(f'Total SRA number: {len(sra_list)}')
 
 
 def do_path(args, fs):
@@ -290,13 +307,19 @@ def do_info(args, fs):
     info_list = []
     err_list = []
     for sra_id in SRAIDs:
+        if not fs.check(sra_id=sra_id, throw_exc=False):
+            err_list.append(f'{sra_id} is not found in database')
+            continue
         try:
             info_list.append(fs.get_validation_info(sra_id))
         except FileNotFoundError:
-            err_list.append(f'{sra_id} not found in database')
+            err_list.append(f'{sra_id} does not have info file. '
+                            'Please run: sra-repo.py check --validate')
 
     import pprint
-    pprint.pprint(info_list)
+    if any(info_list):
+        cout('Information:')
+        pprint.pprint(info_list)
     if any(err_list):
         cerr('Error messages:')
         pprint.pprint(err_list)
@@ -341,6 +364,8 @@ def do_fetch(args, fs):
         temp_directory=args.tmpdir,
         repos=repos,
         showcmds=args.showcmds,
+        showurl=args.showurl,
+        target_directory=args.targetdir
     )
 
     fetcher.fetch(ntasks=args.ntasks, count=args.count)
@@ -360,6 +385,21 @@ def do_delete(args, fs):
 
     for ena_acc in args.ENAIDs:
         fs.delete(ena_acc)
+
+
+def do_inventory(args, fs):
+
+    import shutil
+
+    cerr(f'Root DB directory: {fs.__storage_root_path__}')
+
+    sra_list = fs.list()
+    cerr(f'Total SRA number: {len(sra_list)}')
+
+    res = shutil.disk_usage(fs.__storage_root_path__)
+    cerr(f'Used space: {byte_conversion(res.used)}')
+    cerr(f'Free space: {byte_conversion(res.free)}')
+    cerr(f'Allocated space: {byte_conversion(res.total)}')
 
 
 def iter_samplefile(samplefile):
