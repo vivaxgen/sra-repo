@@ -29,4 +29,15 @@ def md5sum_file(path, prefix_cmds=[]):
     return output.split()[0].decode('UTF-8')
 
 
+def byte_conversion(size):
+    r = 1024 * 1024
+    if size < r:
+        return f'{size/r:3.2f} MB'
+    r *= 1024
+    if size < r:
+        return f'{size/r:3.2f} GB'
+    r *= 1024
+    return f'{size/r:6.2f} TB'
+
+
 # EOF
