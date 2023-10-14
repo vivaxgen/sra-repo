@@ -1,6 +1,7 @@
 
 import io
 import pathlib
+import shutil
 
 
 from dataclasses import dataclass
@@ -36,13 +37,15 @@ class SRA_Fetcher(object):
     helpers = []
 
     def __init__(self, sraids, *, filestore, temp_directory, repos,
-                 showcmds=False):
+                 showcmds=False, showurl=False, target_directory=None):
 
         self.sraids = sraids
         self.filestore = filestore
         self.temp_directory = pathlib.Path(temp_directory)
         self.helpers = [r(self) for r in repos]
         self.showcmds = showcmds
+        self.showurl = showurl
+        self.target_directory = target_directory
 
         self.sra_d = {}
         self.path_d = {}
@@ -142,7 +145,8 @@ class SRA_Fetcher(object):
         self.url_path_queue.put(None)
      
     def _before_started(self, url, localpth):
-        pass
+        if self.showurl:
+            self.console.log(f'Start downloading: {url}')
 
     def _after_finished(self, url, localpath):
 
@@ -160,12 +164,18 @@ class SRA_Fetcher(object):
                     _c(f'ERROR found during post-downloading {sra.acc_id}. Skipping...')
                     return
 
-                self.filestore.store(
-                    sra.acc_id,
-                    sra.paths,
-                    sra.info,
-                    use_move=True,
-                )
+                if self.target_directory is not None:
+                    # instead of storing to the fs database, just move to target dir
+                    for srapath in sra.paths:
+                        shutil.move(srapath, self.target_directory)
+                else:
+                    self.filestore.store(
+                        sra.acc_id,
+                        sra.paths,
+                        sra.info,
+                        use_move=True,
+                    )
+
                 self.completed += 1
                 _c(f'({self.completed}/{len(self.sraids)}) '
                    f'Stored {len(sra.paths)} file(s) for {sra.acc_id}')
