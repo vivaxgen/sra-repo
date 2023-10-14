@@ -252,16 +252,36 @@ class SRAFileStorage(object):
 
         return files
 
-    def list(self, patterns):
-        pass
+    def list(self, pattern: str | None = None):
+        """ provide unsorted list of all available SRA IDs """
 
-    def delete(self, sra_id):
+        sra_ids = []
+
+        # walk across 1st layer
+        for dir_1 in self.__storage_root_path__.iterdir():
+
+            if dir_1.name == '.sra-repo-db':
+                continue
+
+            # walk across 2nd layer
+            for dir_2 in dir_1.iterdir():
+
+                for sra_id in dir_2.iterdir():
+                    sra_ids.append(sra_id)
+
+        if not pattern:
+            return sra_ids
+
+        # process pattern here
+        return sra_ids
+
+    def delete(self, sra_id: str):
         store_dir = self.get_dirpath(sra_id)
         if not store_dir.is_dir():
             raise ValueError(f'SRA ID: {sra_id} does not exist in DB')
         shutil.rmdir(store_dir)
 
-    def get_dirpath(self, sra_id, check=False):
+    def get_dirpath(self, sra_id: str, check: bool = False):
         """ return a Path """
 
         prefix, suffix = re_sraid.match(sra_id).groups()
@@ -277,11 +297,17 @@ class SRAFileStorage(object):
                 raise ValueError(f'SRA {sra_id} does not exist!')
         return path
 
-    def get_read_files(self, sra_id):
+    def get_read_files(self, sra_id: str):
         sra_dir = self.get_dirpath(sra_id, check=True)
         return [a_file for a_file in sra_dir.iterdir() if a_file.name.endswith('.fastq.gz')]
 
-    def check(self, *, sra_id=None, store_dir=None, verify=False, throw_exc=True):
+    def check(self,
+              *,
+              sra_id: str | None = None,
+              store_dir: str | None = None,
+              verify: bool = False,
+              throw_exc: bool = True
+    ):
 
         if sra_id:
             store_dir = self.get_dirpath(sra_id)
@@ -306,7 +332,7 @@ class SRAFileStorage(object):
 
         return False
 
-    def get_lockfile(self, store_dir):
+    def get_lockfile(self, store_dir: str | pathlib.Path):
         return (self.__storage_root_path__ / '.lock' / store_dir.name).as_posix()
 
 
