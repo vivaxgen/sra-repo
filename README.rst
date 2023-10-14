@@ -43,7 +43,7 @@ Fetching SRAs from public database (by default, sra-repo.py will try EBI ENA fir
 
 Fetching SRAs with SRA IDs taken from a file containing each ID per line::
 
-    $ sra-repo.py fetch --ntasks 10 --sraidfile my_sraids.txt
+    $ sra-repo.py fetch --ntasks 10 --idfile my_sraids.txt
 
 Fetching SRAs with SRA IDs taken from a column named ENA of a tab-delimited file with proper
 headers (ie. a sample file)::
@@ -59,7 +59,7 @@ To check the existance of certain SRA IDs in the database::
 
 or::
 
-    $ sra-repo.py check --sraidfile my_sraids.txt
+    $ sra-repo.py check --idfile my_sraids.txt
 
 or::
 
@@ -94,7 +94,7 @@ To create links for several SRA IDs directly::
 
 A text file or tab-delimited file can also be used::
 
-    $ sra-repo.py link --outdir test --sraidfile my_sraids.txt
+    $ sra-repo.py link --outdir test --idfile my_sraids.txt
 
 or::
 
@@ -136,7 +136,8 @@ sra-repo is written in Python (the development is with Python 3.11) with the fol
 
 Python can be installed either using Conda, or using the operating system software manager
 (eg. dnf for rpm-based Linux system or apt for deb-based Linux system), or download directly
-from https://python.org. To install the above modules, once Python3 has been installed, do the following::
+from https://python.org. Once Python3 has been installed, install the required modules by 
+doing the following::
 
     $ pip3 install pycurl rich requests argcomplete
 
