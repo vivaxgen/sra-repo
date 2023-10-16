@@ -8,7 +8,12 @@ from sra_repo.utils import md5sum_file
 from sra_repo.filestore import SRA_Info
 
 
-def get_ena_filereport(sra_id, query):
+def get_ena_filereport(
+    sra_id: str,
+    query: str = 'study_accession,sample_accession,experiment_accession,run_accession,'
+                 'tax_id,scientific_name,'
+                 'fastq_ftp,submitted_ftp,read_count,base_count,fastq_md5,fastq_bytes'
+):
 
     payload = dict(result='read_run',
                    fields=query,
@@ -51,12 +56,7 @@ class ENA_Helper(object):
 
     def get_sra_info(self, sra_id):
         """ return urls, paths, total_read_count, total_base_count """
-        resp = get_ena_filereport(
-            sra_id,
-            'study_accession,sample_accession,experiment_accession,run_accession,'
-            'tax_id,scientific_name,'
-            'fastq_ftp,submitted_ftp,read_count,base_count,fastq_md5,fastq_bytes'
-        )[0]
+        resp = get_ena_filereport(sra_id)[0]
 
         for tag in ['fastq_ftp', 'submitted_ftp']:
             if tag in resp and (urls := resp[tag]):
@@ -76,8 +76,13 @@ class ENA_Helper(object):
             base_count=int(resp.get('base_count', -1)),
             files=files,
             sizes=list(int(s) for s in resp['fastq_bytes'].split(';')),
-            md5sums=resp['fastq_md5'].split(';')
-
+            md5sums=resp['fastq_md5'].split(';'),
+            metadata=dict(study_id=resp['study_accession'],
+                          sample_id=resp['sample_accession'],
+                          experiment_id=resp['experiment_accession'],
+                          run_id=resp['run_accession'],
+                          tax_id=resp['tax_id'],
+                          species=resp['scientific_name'])
         )
 
         return sra_info
