@@ -11,7 +11,7 @@ from sra_repo.filestore import SRA_Info
 def get_ena_filereport(
     sra_id: str,
     query: str = 'study_accession,sample_accession,experiment_accession,run_accession,'
-                 'tax_id,scientific_name,'
+                 'tax_id,scientific_name,library_name,'
                  'fastq_ftp,submitted_ftp,read_count,base_count,fastq_md5,fastq_bytes'
 ):
 
@@ -79,8 +79,8 @@ class ENA_Helper(object):
             md5sums=resp['fastq_md5'].split(';'),
             metadata=dict(study_id=resp['study_accession'],
                           sample_id=resp['sample_accession'],
+                          sample=resp['library_name'],
                           experiment_id=resp['experiment_accession'],
-                          run_id=resp['run_accession'],
                           tax_id=resp['tax_id'],
                           species=resp['scientific_name'])
         )

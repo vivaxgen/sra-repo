@@ -81,6 +81,22 @@ class Entrez_Helper(object):
                 f'{sra_id} - accession is not identical with {curr_run.attrib["accession"]}'
             )
 
+        # prepare metadata
+        metadata = dict(
+            tax_id=root.find('./EXPERIMENT_PACKAGE/SAMPLE/SAMPLE_NAME/TAXON_ID').text,
+            species=root.find('./EXPERIMENT_PACKAGE/SAMPLE/SAMPLE_NAME/SCIENTIFIC_NAME').text,
+            study_id=root.find(
+                './EXPERIMENT_PACKAGE/STUDY/IDENTIFIERS/EXTERNAL_ID[@namespace="BioProject"]'
+            ).text,
+            sample_id=root.find(
+                './EXPERIMENT_PACKAGE/SAMPLE/IDENTIFIERS/EXTERNAL_ID[@namespace="BioSample"]'
+            ).text,
+            sample=root.find('./EXPERIMENT_PACKAGE/SAMPLE/TITLE').text,
+            experiment_id=root.find(
+                './EXPERIMENT_PACKAGE/EXPERIMENT/IDENTIFIERS/PRIMARY_ID'
+            ).text,
+        )
+
         # create dictionary
         sra_info = SRA_Info(
             sra_id=sra_id,
@@ -91,6 +107,7 @@ class Entrez_Helper(object):
             base_count=int(curr_run.attrib['total_bases']),
             md5sums=None,
             sizes=None,
+            metadata=metadata,
         )
 
         return sra_info

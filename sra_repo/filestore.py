@@ -29,6 +29,7 @@ class SRA_Info:
     files: list[str]
     sizes: list[int] | None
     md5sums: list[str] | None
+    metadata: dict[str] | None
 
     def _idx(self, filename):
         return self.files.index(filename)
