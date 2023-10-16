@@ -28,6 +28,7 @@ class SRA(object):
     pending: int = 0
     error: int = 0
     errmsg: str = ''
+    metadata: dict | None = None
 
     helper: Any = None
 
