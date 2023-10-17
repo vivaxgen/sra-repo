@@ -66,7 +66,8 @@ class SRA_Info:
             base_count=self.base_count,
             files=self.files,
             sizes=self.sizes,
-            md5sums=self.md5sums
+            md5sums=self.md5sums,
+            metadata=self.metadata,
         )
         with open(path, 'w') as f:
             json.dump(d, f)
