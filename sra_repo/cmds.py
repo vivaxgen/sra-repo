@@ -210,6 +210,8 @@ def do_link(args, fs):
     import pathlib
 
     outdir = pathlib.Path(args.outdir)
+    if not outdir.is_dir():
+        cexit(f'ERR: directory [{outdir}] does not exist. Please create first!')
 
     if args.samplefile:
         # read sample file
@@ -232,6 +234,10 @@ def do_link(args, fs):
                 except ValueError:
                     cerr(f'WARN: SRA ID {sra_id} is not in the database. '
                          f'Please run ena-repo fetch first.')
+
+                except FileExistsError as err:
+                    cerr(f'WARN: file {err.filename2} for SRA {sra_id} is already exist '
+                         f'in directory [{outdir}]')
 
             samples.append(sample)
             fastq_files.append(current_reads)
@@ -269,6 +275,9 @@ def do_link(args, fs):
             except ValueError as err:
                 cerr(f'WARN: SRA ID {sra_id} is not in the database. '
                      f'Please run ena-repo fetch first.')
+            except FileExistsError as err:
+                cerr(f'ERR: file {err.filename2} for SRA {sra_id} is already exist '
+                     f'in directory: {outdir}')
 
         cerr(f'INFO: linked {len(read_files)} from {counter} SRA id(s)')
 
@@ -300,6 +309,7 @@ def do_path(args, fs):
 
 def do_info(args, fs):
 
+    import yaml
     # show paths from SRA ids file, sample file or list of SRA IDs in command line
 
     SRAIDs = get_sraids(args)
@@ -316,13 +326,8 @@ def do_info(args, fs):
             err_list.append(f'{sra_id} does not have info file. '
                             'Please run: sra-repo.py check --validate')
 
-    import pprint
-    if any(info_list):
-        cout('Information:')
-        pprint.pprint(info_list)
-    if any(err_list):
-        cerr('Error messages:')
-        pprint.pprint(err_list)
+    d = dict(info=info_list, error=err_list)
+    cout(yaml.dump(d))
 
 
 def do_fetch(args, fs):
