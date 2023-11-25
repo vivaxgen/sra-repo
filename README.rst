@@ -123,6 +123,13 @@ directory structure would be recommended::
     /shared/SRA/tmp [for temporary space during downloads and format convertion]
     /shared/SRA/cache [for samtools-fastq caching system converting CRAM to FASTQ]
 
+To prepare the above directory structures and also install sra-repo, the following commands
+can be used::
+
+    $ export MAIN_ROOT=/share/SRA
+    $ mkdir $MAIN_ROOT/bin $MAIN_ROOT/opt $MAIN_ROOT/opt/env $MAIN_ROOT/store $MAIN_ROOT/tmp $MAIN_ROOT/cache
+    $ git clone https://github.com/vivaxgen/sra-repo.git $MAIN_ROOT/opt/env/
+
 sra-repo is written in Python (the development is with Python 3.11) with the following additional modules used:
 
 * pycurl
