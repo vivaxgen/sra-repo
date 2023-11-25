@@ -56,6 +56,7 @@ class SRA_Fetcher(object):
         self.url_path_queue = Queue(3)
 
         # acquire this lock if we need to modify any of the above variables
+        # to prevent race condition
         self.lock = Lock()
 
         # variables only modified by prepare_url() thread
@@ -68,7 +69,10 @@ class SRA_Fetcher(object):
         if count > 0:
             self.sraids = self.sraids[:count]
 
-        t = self.start_url_fetcher()
+        if ntasks > 1:
+            t = self.start_url_fetcher()
+        else:
+            self.prepare_url()
 
         # perform downloads
         download_utils.download(
@@ -79,7 +83,8 @@ class SRA_Fetcher(object):
             after_finished=self._after_finished,
             console=self.console,
         )
-        t.join()
+        if ntasks > 1 and t:
+            t.join()
 
     def start_url_fetcher(self):
 
