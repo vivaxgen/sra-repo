@@ -82,6 +82,19 @@ class Entrez_Helper(object):
             )
 
         # prepare metadata
+
+        # get sample name
+        sample_tree = root.find('./EXPERIMENT_PACKAGE/SAMPLE/TITLE')
+        if sample_tree is None:
+            # fine something else:
+            sample_tree = root.find(
+                './EXPERIMENT_PACKAGE/SAMPLE/IDENTIFIERS/SUBMITTER_ID[@label="Sample name"]'
+            )
+            if sample_tree is None:
+                raise ValueError(f"Cannot find sample name for SRA {sra_id} from Entrez XML file.")
+
+        sample = sample_tree.text
+
         metadata = dict(
             tax_id=root.find('./EXPERIMENT_PACKAGE/SAMPLE/SAMPLE_NAME/TAXON_ID').text,
             species=root.find('./EXPERIMENT_PACKAGE/SAMPLE/SAMPLE_NAME/SCIENTIFIC_NAME').text,
@@ -91,7 +104,7 @@ class Entrez_Helper(object):
             sample_id=root.find(
                 './EXPERIMENT_PACKAGE/SAMPLE/IDENTIFIERS/EXTERNAL_ID[@namespace="BioSample"]'
             ).text,
-            sample=root.find('./EXPERIMENT_PACKAGE/SAMPLE/TITLE').text,
+            sample=sample,
             experiment_id=root.find(
                 './EXPERIMENT_PACKAGE/EXPERIMENT/IDENTIFIERS/PRIMARY_ID'
             ).text,
