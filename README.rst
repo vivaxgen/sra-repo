@@ -108,8 +108,19 @@ separated by comma for paired files, and semi-colon for different SRA for the sa
 
     $ sra-repo.py link --outdir test --o my-manifest.tsv --samplefile my_samplefile.tsv:Sample,ENA
 
-Installation
-------------
+Quick Installation
+------------------
+
+Decide where the main root directory for sra-repo and its storage will be installed.
+Run the following command to install sra-repo, including all of its dependencies, and provide the directory when prompted.
+
+    "${SHELL}" <(curl -L https://raw.githubusercontent.com/vivaxgen/install/main/sra-repo.sh)
+
+Make sure the installation has completed sucessfully.
+Take a note on the activation script that needs to be sourced every time sra-repo is going to be used.
+
+Manual Installation
+-------------------
 
 The first step is to decide the main root directory where sra-repo and its repository system
 will be stored. For example, with main root directory of ``/shared/SRA``, the following
