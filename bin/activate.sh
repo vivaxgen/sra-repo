@@ -10,6 +10,14 @@ export SRA_REPO_BASE="$(dirname $_mydir)"
 export PATH=${SRA_REPO_BASE}/bin/:${PATH}
 export PYTHONPATH="${SRA_REPO_BASE}/:${PYTHONPATH}"
 
+# setting up environment
+export SRA_REPO_STORE=${VVG_BASEDIR}/store
+export SRA_REPO_TMPDIR=${VVG_BASEDIR}/tmp
+
+# for samtools fasta commands
+export REF_PATH=${VVG_BASEDIR}/cache/%2s/%2s/%s:http://www.ebi.ac.uk/ena/cram/md5/%s
+export REF_CACHE=${VVG_BASEDIR}/cache/%2s/%2s/%s
+
 
 # BELOW is taken verbatim from argcomplete global autocomplete source script
 # please read https://kislyuk.github.io/argcomplete/
