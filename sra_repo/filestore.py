@@ -10,7 +10,7 @@ from flufl.lock import Lock, TimeOutError
 from sra_repo.utils import cexit, cerr, check_gzip_file
 
 
-re_sraid = re.compile('(\D+)(.+)')
+re_sraid = re.compile(r'(\D+)(.+)')
 
 proper_prefixes = ['ERR', 'SRR', 'SRS']
 
