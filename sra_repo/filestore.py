@@ -219,6 +219,7 @@ class SRAFileStorage(object):
         outdir: str | pathlib.Path,
         dryrun: bool = False,
         flat: bool = True,
+        add_dir_prefix: bool = False,
     ):
         """ create a symbolic link from source fastq file to outdir, return the path(s)
             to all fastq read files """
@@ -228,6 +229,8 @@ class SRAFileStorage(object):
             raise ValueError(f'ERR: store dir {store_dir} does not exist!')
 
         files = []
+        if type(outdir) == str:
+            outdir = pathlib.Path(outdir)
 
         if flat:
             # create a symlink of files in outdir
@@ -251,6 +254,10 @@ class SRAFileStorage(object):
                 cerr(f' {target_link} -> {store_dir}')
             for a_file in target_link.iterdir():
                 files.append()
+
+        if add_dir_prefix:
+            prefix = str(outdir) + '/'
+            files = [(prefix + f) for f in files]
 
         return files
 

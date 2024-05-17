@@ -73,6 +73,8 @@ def init_argparse():
     cmd_link.add_argument('-o', '--outfile',
                           help='output file containing sample manifest and their '
                           'associated fastq read files')
+    cmd_link.add_argument('--add-dir-prefix', default=False, action='store_true',
+                          help='add outdir prefix  in manifest file')
     cmd_link.add_argument('--outdir',  required=True,
                           help='output directory')
     input_args(cmd_link)
@@ -228,7 +230,8 @@ def do_link(args, fs):
             for sra_id in sra_ids:
 
                 try:
-                    read_files = fs.link(sra_id, outdir, dryrun=args.check)
+                    read_files = fs.link(sra_id, outdir, dryrun=args.check,
+                                         add_dir_prefix=args.add_dir_prefix)
                     current_reads.append(read_files)
 
                 except ValueError:
