@@ -5,6 +5,7 @@ A rudimentary URL downloader (like wget or curl) to demonstrate Rich progress ba
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Iterable, Callable, Any
+from urllib.parse import urlparse
 import pycurl
 import errno
 
@@ -20,6 +21,11 @@ from rich.progress import (
 
 block_size = 128 * 1024
 fatal_error = False
+
+
+def get_protocol(url):
+    parsed_url = urlparse(url)  # Parse the URL
+    return parsed_url.scheme.lower()  # Extract the protocol (scheme)
 
 
 class EasyCURL(object):
@@ -88,11 +94,12 @@ class EasyCURL(object):
                 eno, msg = err.args
                 if eno == pycurl.E_WRITE_ERROR:
                     fatal_error = True
+                    _c("FATAL ERROR: cannot write to disk. Aborting...")
+                    break
                 _c(
                     f"ERROR downloading {url}!. Error is {type(err)} with msg: {str(err)} "
-                    f'{"Aborting..." if tries == 0 else "Retrying..."}'
+                    + (f"Aborting..." if tries <= 0 else f"Retrying [{tries} more]...")
                 )
-                continue
 
             except OSError as err:
                 # catch OS errors
@@ -106,9 +113,8 @@ class EasyCURL(object):
                 resume = True
                 _c(
                     f"ERROR downloading {url}!. Error is {type(err)} with msg: {str(err)} "
-                    f'{"Aborting..." if tries == 0 else "Retrying..."}'
+                    + (f"Aborting..." if tries <= 0 else f"Retrying [{tries} more]...")
                 )
-                continue
 
             finally:
                 if self.task_id and self.progress:
@@ -118,6 +124,11 @@ class EasyCURL(object):
             # the following will be executed only if download process completed successfully
             if completed and after_finished:
                 after_finished(url, target_path)
+                break
+
+            if tries > 0:
+                _c(f"sleeping for 5 seconds before retrying {url}")
+                time.sleep(5)
 
     def _download(
         self,
@@ -150,6 +161,9 @@ class EasyCURL(object):
                 self.curl = c = pycurl.Curl()
                 c.setopt(c.URL, url)
 
+                if get_protocol(url) == "ftp":
+                    c.setopt(c.FTP_USE_EPSV, 0)  # Disable passive mode, use active mode
+
                 if self.resume_from > 0:
                     c.setopt(c.RESUME_FROM, self.resume_from)
                 c.setopt(c.WRITEDATA, dest_file)
@@ -159,10 +173,13 @@ class EasyCURL(object):
                 c.setopt(c.XFERINFOFUNCTION, self._progress_monitor)
 
                 # perform download
+                _c(f"Connecting to {url}...")
                 c.perform()
                 c.close()
 
-            # cerr(f'self.downloaded: {self.downloaded}, self.total_size: {self.total_size}')
+        _c(f"Downloaded: {self.downloaded} out of: {self.total_size} for {url}")
+        if self.total_size == 0:
+            return False
         return True
 
 
@@ -245,7 +262,7 @@ def download(
                 # get the result
                 future.result()
 
-        _c("All files has been downloaded")
+        _c("All files has been processed.")
 
 
 # EOF
