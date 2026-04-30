@@ -136,6 +136,12 @@ def init_argparse():
         help="use for debugging - number of SRAs to download from list [-1]",
     )
     cmd_fetch.add_argument(
+        "--tries",
+        default=3,
+        type=int,
+        help="number of tries before giving up when non-fatal errors occur [3]",
+    )
+    cmd_fetch.add_argument(
         "--reverselist",
         default=False,
         action="store_true",
@@ -158,6 +164,21 @@ def init_argparse():
         default=None,
         help="instead of storing to central repository, move the "
         "downloaded files to this target directory",
+    )
+    cmd_fetch.add_argument(
+        "--resume",
+        default=False,
+        action="store_true",
+        help="resume from currently available files in temp directory, use with caution",
+    )
+    cmd_fetch.add_argument(
+        "--failed-ids", default=None, help="output filename for failed ACC IDs"
+    )
+    cmd_fetch.add_argument(
+        "--show-sra-info",
+        default=False,
+        action="store_true",
+        help="show SRA info during fetching",
     )
     site_args(cmd_fetch)
     input_args(cmd_fetch)
@@ -182,6 +203,13 @@ def init_argparse():
         action="store_true",
         help="count number of each species",
     )
+
+    # command: remove
+    cmd_remove = cmds.add_parser("remove", help="remove SRA IDs")
+    cmd_remove.add_argument(
+        "--ignore-errors", action="store_true", default=False, help="ignore any errors"
+    )
+    input_args(cmd_remove)
 
     # command: convert-accid
     cmd_convert_accid = cmds.add_parser(
@@ -232,6 +260,9 @@ def do_command(args):
 
         case "inventory":
             do_inventory(args, fs)
+
+        case "remove":
+            do_remove(args, fs)
 
         case "convert-accid":
             do_convert_accid(args, fs)
@@ -516,9 +547,11 @@ def do_fetch(args, fs):
         showcmds=args.showcmds,
         showurl=args.showurl,
         target_directory=args.targetdir,
+        resume=args.resume,
+        show_sra_info=args.show_sra_info,
     )
 
-    fetcher.fetch(ntasks=args.ntasks, count=args.count)
+    fetcher.fetch(ntasks=args.ntasks, count=args.count, tries=args.tries)
 
     if any(fetcher.sra_errors) or any(fetcher.sra_d):
         cerr(f"Completed {fetcher.completed} out of {len(sraid_dl)} SRAs to download.")
@@ -531,16 +564,32 @@ def do_fetch(args, fs):
             )
         )
         cerr("\n".join(fetcher.sra_d.keys()))
+        if args.failed_ids:
+            with open(args.failed_ids, "w") as f_out:
+                f_out.write(
+                    "\n".join(sra_id for (sra_id, _) in fetcher.sra_errors.items())
+                )
+                f_out.write("\n".join(fetcher.sra_d.keys()))
+            cerr(f"Failed ACC ID written to {args.failed_ids}")
     else:
         cerr(f"All {fetcher.completed} SRA(s) have been successfully downloaded.")
 
     # report = ena_downloader.fetch_ena(enaid_dl, args.tmpdir, fs)
 
 
-def do_delete(args, fs):
+def do_remove(args, fs):
 
-    for ena_acc in args.ENAIDs:
-        fs.delete(ena_acc)
+    sraids = get_sraids(args)
+
+    for sra_id in sraids:
+        try:
+            fs.remove(sra_id)
+            cerr(f"SRAID {sra_id} removed.")
+        except ValueError as e:
+            if args.ignore_errors:
+                cerr(e)
+            else:
+                raise
 
 
 def do_inventory(args, fs):
