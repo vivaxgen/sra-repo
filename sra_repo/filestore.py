@@ -291,11 +291,12 @@ class SRAFileStorage(object):
         # process pattern here
         return sra_ids
 
-    def delete(self, sra_id: str):
+    def remove(self, sra_id: str):
         store_dir = self.get_dirpath(sra_id)
         if not store_dir.is_dir():
             raise ValueError(f"SRA ID: {sra_id} does not exist in DB")
-        shutil.rmdir(store_dir)
+        store_dir.chmod(self.dir_edit_mode)
+        shutil.rmtree(store_dir)
 
     def get_dirpath(self, sra_id: str, check: bool = False):
         """return a Path"""
