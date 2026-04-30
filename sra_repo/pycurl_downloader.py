@@ -5,6 +5,7 @@ import queue
 import random
 import threading
 import time
+import errno
 from concurrent.futures import ThreadPoolExecutor, Future, wait, FIRST_EXCEPTION
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -270,18 +271,11 @@ class DownloadManager:
                 finally:
                     curl.close()
         except OSError as exc:
-            if exc.errno in (
-                os.errno.ENOSPC,
-                (
-                    getattr(os, "errno", type("Errno", (), {})).ENOSPC
-                    if hasattr(os, "errno")
-                    else None
-                ),
-            ):
+            if exc.errno in (errno.ENOSPC,):
                 raise FatalDownloadError(
                     f"No space left while downloading {task.url}"
                 ) from exc
-            if exc.errno in (os.errno.EACCES,):
+            if exc.errno in (errno.EACCES,):
                 raise FatalDownloadError(
                     f"No permission to write {output_path}"
                 ) from exc
@@ -494,8 +488,11 @@ class _SafeFileWriter:
         try:
             return self._handle.write(data)
         except OSError as exc:
-            if exc.errno in (getattr(os, "errno", type("Errno", (), {})).ENOSPC,):
+            if exc.errno in (errno.ENOSPC,):
                 raise FatalDownloadError("Disk space exhausted") from exc
-            if exc.errno in (getattr(os, "errno", type("Errno", (), {})).EACCES,):
+            if exc.errno in (errno.EACCES,):
                 raise FatalDownloadError("Permission denied") from exc
             raise
+
+
+# EOF
