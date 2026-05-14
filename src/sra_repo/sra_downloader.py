@@ -9,7 +9,7 @@ from queue import Queue
 from typing import Any
 from rich.progress import Console
 
-from sra_repo import download_utils3 as download_utils
+#from sra_repo import download_utils3 as download_utils
 from sra_repo.filestore import SRA_Info
 from sra_repo import pycurl_downloader
 
