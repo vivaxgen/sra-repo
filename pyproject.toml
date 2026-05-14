@@ -1,0 +1,16 @@
+[project]
+name = "sra-repo"
+version = "0.1.0"
+description = "SRA Repository Management Tools"
+readme = "README.rst"
+requires-python = ">=3.14"
+dependencies = [
+    "argcomplete>=3.6.3",
+    "flufl-lock>=9.1.0",
+    "ipython>=9.13.0",
+    "pandas>=3.0.3",
+    "pycurl>=7.46.0",
+    "pyyaml>=6.0.3",
+    "requests>=2.34.1",
+    "rich>=15.0.0",
+]

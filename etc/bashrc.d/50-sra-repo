@@ -1,0 +1,37 @@
+#!/bin/sh
+
+## source this first to set up proper environment and enabling bash autocomplete
+
+_script="$(readlink -f ${BASH_SOURCE[0]})"
+
+## Delete last component from $_script ##
+_mydir="$(dirname $_script)"
+
+export SRA_REPO_BASE="$(dirname $(dirname $_mydir))"
+export PATH=${SRA_REPO_BASE}/bin/:${PATH}
+#export PYTHONPATH="${SRA_REPO_BASE}/:${PYTHONPATH}"
+
+# setting up environment
+export SRA_REPO_STORE=${VVG_BASEDIR}/store
+export SRA_REPO_TMPDIR=${VVG_BASEDIR}/tmp
+
+# for samtools fasta commands
+export REF_PATH=${VVG_BASEDIR}/cache/%2s/%2s/%s:http://www.ebi.ac.uk/ena/cram/md5/%s
+export REF_CACHE=${VVG_BASEDIR}/cache/%2s/%2s/%s
+
+# 1. Point to your remote project root folder
+export MY_PROJECT_ROOT="${VVG_BASEDIR}"
+
+# 2. Force uv to change its context to your project directory for all operations
+export UV_WORKING_DIR="$MY_PROJECT_ROOT"
+
+# 3. Direct uv to execute everything inside your project's specific virtual environment
+export UV_PROJECT_ENVIRONMENT="$MY_PROJECT_ROOT/.venv"
+
+# 4. Inject the project's isolated python binaries directly into your system PATH
+export PATH="$UV_PROJECT_ENVIRONMENT/bin:$PATH"
+
+# register bash autocomplete
+eval "$(register-python-argcomplete sra-repo.py)"
+
+# EOF
