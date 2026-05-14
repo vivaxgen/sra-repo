@@ -116,7 +116,7 @@ Quick Installation
 Decide where the main root directory for sra-repo and its storage will be installed.
 Run the following command to install sra-repo, including all of its dependencies, and provide the directory when prompted::
 
-    "${SHELL}" <(curl -L https://raw.githubusercontent.com/vivaxgen/install/main/sra-repo.sh)
+    "${SHELL}" <(curl -L https://raw.githubusercontent.com/vivaxgen/sra-repo/main/install.sh)
 
 Make sure the installation has completed sucessfully.
 Take a note on the activation script that needs to be sourced every time sra-repo is going to be used.
